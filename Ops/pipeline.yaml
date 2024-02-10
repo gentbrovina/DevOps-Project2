@@ -1,0 +1,28 @@
+stages:
+  - docker build
+  - docker push 
+  - deploy to EKS
+
+Build Docker Image:  
+  stage: docker build
+  before_script:
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS  
+  script:
+    - docker build -t "image_name" .
+   
+Push to registry:
+  Stage: docker push
+  before_script:
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS
+  script:  
+    - docker push "aws_ecr_repo_name"
+
+Deploy Pods to EKS Cluster:
+  Stage: deploy to EKS
+  image: 
+    name:
+         gentbrovina/kub-users:latest 
+         gentbrovina/kub-auth:latest
+  script:
+    - kubectl apply -f auth.yaml
+    - kubectl apply -f users.yaml       
